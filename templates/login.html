@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Sign in</title>
+    <style>
+        :root {
+            --bg: #f5f7fb;
+            --card: #ffffff;
+            --primary: #2563eb;
+            --muted: #6b7280;
+            --danger: #ef4444;
+            --radius: 10px;
+            --shadow: 0 6px 20px rgba(31,41,55,0.08);
+            font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+        }
+        html,body{height:100%}
+        body{
+            margin:0;
+            background: linear-gradient(180deg,#eef2ff 0%,var(--bg) 100%);
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            padding:24px;
+            color:#0f172a;
+        }
+        .container{
+            width:100%;
+            max-width:420px;
+        }
+        .card{
+            background:var(--card);
+            border-radius:var(--radius);
+            box-shadow:var(--shadow);
+            padding:28px;
+        }
+        .brand{
+            text-align:center;
+            margin-bottom:18px;
+        }
+        .brand h1{
+            margin:0;
+            font-size:20px;
+            letter-spacing:0.2px;
+        }
+        .lead{
+            color:var(--muted);
+            font-size:14px;
+            text-align:center;
+            margin-bottom:18px;
+        }
+        form > label{
+            display:block;
+            margin-bottom:8px;
+            font-size:13px;
+            color:#111827;
+        }
+        .field{
+            display:flex;
+            align-items:center;
+            gap:8px;
+            margin-bottom:14px;
+        }
+        input[type="email"],
+        input[type="password"]{
+            width:100%;
+            padding:10px 12px;
+            border-radius:8px;
+            border:1px solid #e6e9ef;
+            font-size:14px;
+            background:#fff;
+            outline:none;
+            box-sizing:border-box;
+        }
+        input:focus{
+            border-color:var(--primary);
+            box-shadow:0 0 0 4px rgba(37,99,235,0.08);
+        }
+        .actions{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            margin-bottom:18px;
+            gap:12px;
+        }
+        .checkbox{
+            display:flex;
+            align-items:center;
+            gap:8px;
+            color:var(--muted);
+            font-size:13px;
+        }
+        button[type="submit"]{
+            background:var(--primary);
+            color:#fff;
+            padding:10px 14px;
+            border:0;
+            border-radius:8px;
+            font-weight:600;
+            cursor:pointer;
+            transition:transform .06s ease;
+        }
+        button:active{transform:translateY(1px)}
+        .alt{
+            text-align:center;
+            margin-top:14px;
+            font-size:13px;
+            color:var(--muted);
+        }
+        a{
+            color:var(--primary);
+            text-decoration:none;
+        }
+        .note{
+            color:var(--muted);
+            font-size:12px;
+            margin-top:8px;
+        }
+        .error{
+            color:var(--danger);
+            font-size:13px;
+            margin-top:6px;
+        }
+        .password-toggle{
+            background:transparent;
+            border:0;
+            padding:6px;
+            cursor:pointer;
+            color:var(--muted);
+            border-radius:6px;
+        }
+        @media (max-width:420px){
+            .card{padding:20px}
+        }
+    </style>
+</head>
+<body>
+    <main class="container" role="main">
+        <section class="card" aria-labelledby="signin-title">
+            <div class="brand">
+                <h1 id="signin-title">Welcome back</h1>
+            </div>
+            <p class="lead">Sign in to your account to continue</p>
+
+            <form id="loginForm" action="/login" method="post" novalidate>
+                <!-- If your backend uses a CSRF token, insert it here -->
+                <!-- e.g. <input type="hidden" name="csrf_token" value="{{ csrf_token }}"> -->
+
+                <div>
+                    <label for="email">Email</label>
+                    <input id="email" name="email" type="email" autocomplete="email" required placeholder="you@example.com" />
+                    <div class="error" id="emailError" aria-live="polite" style="display:none"></div>
+                </div>
+
+                <div style="margin-top:12px">
+                    <label for="password">Password</label>
+                    <div class="field" style="margin-top:6px">
+                        <input id="password" name="password" type="password" autocomplete="current-password" required placeholder="••••••••" />
+                        <button type="button" class="password-toggle" id="togglePwd" aria-label="Show password">Show</button>
+                    </div>
+                    <div class="error" id="passwordError" aria-live="polite" style="display:none"></div>
+                </div>
+
+                <div class="actions" style="margin-top:6px">
+                    <label class="checkbox">
+                        <input type="checkbox" name="remember" />
+                        Remember me
+                    </label>
+                    <a href="/forgot">Forgot?</a>
+                </div>
+
+                <div>
+                    <button type="submit" id="submitBtn">Sign in</button>
+                </div>
+
+                <p class="alt">Don’t have an account? <a href="/signup">Sign up</a></p>
+                <p class="note">By continuing you agree to the Terms of Service and Privacy Policy.</p>
+            </form>
+        </section>
+    </main>
+
+    <script>
+        (function(){
+            const form = document.getElementById('loginForm');
+            const email = document.getElementById('email');
+            const pwd = document.getElementById('password');
+            const emailError = document.getElementById('emailError');
+            const pwdError = document.getElementById('passwordError');
+            const toggle = document.getElementById('togglePwd');
+
+            toggle.addEventListener('click', () => {
+                const isPwd = pwd.type === 'password';
+                pwd.type = isPwd ? 'text' : 'password';
+                toggle.textContent = isPwd ? 'Hide' : 'Show';
+                toggle.setAttribute('aria-label', isPwd ? 'Hide password' : 'Show password');
+            });
+
+            function validateEmail(v){
+                // simple email check
+                return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+            }
+
+            form.addEventListener('submit', function(e){
+                let ok = true;
+                emailError.style.display = 'none';
+                pwdError.style.display = 'none';
+
+                if(!email.value || !validateEmail(email.value)){
+                    emailError.textContent = 'Please enter a valid email address';
+                    emailError.style.display = 'block';
+                    ok = false;
+                }
+                if(!pwd.value || pwd.value.length < 6){
+                    pwdError.textContent = 'Password must be at least 6 characters';
+                    pwdError.style.display = 'block';
+                    ok = false;
+                }
+
+                if(!ok){
+                    e.preventDefault();
+                    // focus first invalid
+                    if(emailError.style.display === 'block') email.focus();
+                    else pwd.focus();
+                }
+            });
+
+            // optional: enable Enter to submit from password field (native), and basic accessibility
+            email.addEventListener('input', ()=>{ if(emailError.style.display==='block') emailError.style.display='none'; });
+            pwd.addEventListener('input', ()=>{ if(pwdError.style.display==='block') pwdError.style.display='none'; });
+        })();
+    </script>
+</body>
+</html></div>

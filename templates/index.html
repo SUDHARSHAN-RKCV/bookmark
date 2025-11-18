@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+
+<!-- 🧭 Main Content -->
+<div class="main-container">
+  <div class="card-container" id="cardContainer">
+    
+  {% for link in links %}
+    <a href="{{ link.href }}" target="{{ link.target }}" class="card">
+      <i class="fas {{ link['Icon'] }}"></i>
+      <span>{{ link['Team / Title'] }}</span>
+    </a>
+  {% endfor %}
+  </div>
+</div>
+{% endblock %}

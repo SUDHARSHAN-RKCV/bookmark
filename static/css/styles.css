@@ -1,0 +1,281 @@
+/* ========== Global Layout ========== */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', sans-serif;
+  color: #fff;
+  background: linear-gradient(135deg, #348ee1 0%);
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* ========== Main Container ========== */
+.main-container {
+  text-align: center;
+  padding-top: 100px;
+  min-height: calc(100vh - 100px);
+  padding-bottom: 60px;
+}
+
+.title {
+  font-size: 60px;
+  font-weight: 600;
+  margin-bottom: 30px;
+}
+
+/* ========== Search Box ========== */
+.search-container input {
+  width: 60%;
+  padding: 15px;
+  border-radius: 30px;
+  border: none;
+  font-size: 18px;
+  outline: none;
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  transition: background 0.3s ease;
+}
+
+.search-container input::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.search-container input:focus {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* ========== Card Layout ========== */
+.card-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 40px;
+  gap: 25px;
+}
+
+.card {
+  background: rgba(255, 255, 255, 0.267);
+  border-radius: 16px;
+  padding: 20px;
+  width: 220px;
+  height: 130px;
+  text-decoration: none;
+  color: #fff;
+  font-size: 18px;
+  display: flex;
+  flex-direction: column; /* 🔹 Stacks icon + text vertically */
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: all 0.3s ease;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+}
+
+.card:hover {
+  background: rgba(253, 73, 128, 0.45);
+  transform: translateY(-6px);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.25);
+}
+
+.card i {
+  font-size: 36px;
+  color: #ffd9f4; /* accent */
+}
+
+.card span {
+  font-size: 16px;
+  font-weight: 500;
+  text-align: center;
+  line-height: 1.2em;
+}
+
+/* ========== Section Title (Optional) ========== */
+.section-title {
+  font-size: 24px;
+  margin-top: 50px;
+  font-weight: 500;
+  text-align: left;
+  color: #fff;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  width: 80%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-bottom: 5px;
+}
+
+/* ========== Responsive Design ========== */
+@media (max-width: 768px) {
+  .title {
+    font-size: 40px;
+  }
+
+  .search-container input {
+    width: 80%;
+  }
+
+  .card {
+    width: 80%;
+    height: 110px;
+  }
+
+  .card i {
+    font-size: 30px;
+  }
+
+  .section-title {
+    width: 90%;
+    font-size: 20px;
+  }
+}
+/* ========== Topbar ========== */
+.topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: rgba(25, 0, 70, 0.6);
+  backdrop-filter: blur(10px);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 25px;
+  z-index: 1000;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+}
+
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.menu-toggle {
+  font-size: 22px;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.menu-toggle:hover {
+  color: #ffcd4b;
+}
+
+.logo {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+.topbar-right a {
+  color: #fff;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+}
+.topbar-right a:hover {
+  color: #ffcd4b;
+}
+
+/* --- Search Box Inside Topbar --- */
+.search-box {
+  position: relative;
+  display: none;
+  transition: all 0.3s ease;
+}
+
+.search-box.active {
+  display: block;
+}
+
+.search-box input {
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: none;
+  outline: none;
+  font-size: 14px;
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  width: 180px;
+  transition: width 0.3s ease, background 0.3s ease;
+}
+
+/* ========== Sidebar ========== */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: -260px;
+  width: 260px;
+  height: 100%;
+  background: rgba(20, 0, 60, 0.95);
+  backdrop-filter: blur(12px);
+  transition: left 0.3s ease;
+  z-index: 1500;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar.active {
+  left: 0;
+}
+
+.sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.sidebar-header h3 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.close-menu {
+  font-size: 20px;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.close-menu:hover {
+  color: #ffcd4b;
+}
+
+.sidebar-links {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+
+.sidebar-links a {
+  color: #fff;
+  text-decoration: none;
+  font-size: 16px;
+  padding: 10px 0;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.sidebar-links a:hover {
+  color: #ffcd4b;
+  transform: translateX(5px);
+}
+
+/* Optional: smooth show/hide of search input */
+.search-container {
+  opacity: 1;
+  transition: opacity 0.3s ease, height 0.3s ease;
+}
+
+.search-container.visible {
+  opacity: 1;
+  height: auto;
+}
