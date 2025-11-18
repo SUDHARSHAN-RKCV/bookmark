@@ -4,8 +4,8 @@ from models import db, User
 def seed_users():
     user_data = [
         ("admin@example.com", "admin", ["l1_ops"], "password123"),
-        ("manager@example.com", "manager", ["operations", "sales"], "secret456"),
-        ("sales@example.com", "member", ["sales"], "salespass"),
+        ("manager@example.com", "manager", ["operations", "sales"], "password123"),
+        ("sales@example.com", "member", ["sales"], "password123"),
     ]
 
     for email, role, teams, password in user_data:
