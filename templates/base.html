@@ -21,9 +21,20 @@
         <input type="text" id="search" placeholder="Search apps or teams...">
       </div>
       <i class="fas fa-search" id="searchIcon" title="Search"></i>
+
       <a href="{{ url_for('home') }}" title="Home">
         <i class="fas fa-home"></i>
       </a>
+
+      {% if current_user.is_authenticated %}
+        <a href="{{ url_for('logout') }}" title="Logout">
+          <i class="fas fa-unlock"></i>
+        </a>
+      {% else %}
+        <a href="{{ url_for('login') }}" title="Login">
+          <i class="fas fa-lock"></i>
+        </a>
+      {% endif %}
     </div>
   </div>
 

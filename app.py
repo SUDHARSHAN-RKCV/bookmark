@@ -1,13 +1,13 @@
 from flask import Flask, render_template, redirect, url_for, flash
 from flask_login import LoginManager, login_required, current_user
 import os
-from sqlalchemy import text, inspect  # 👈 NEW imports
+from sqlalchemy import text, inspect  
 
 from helpers import load_excel, prepare_links
 from errors import register_error_handlers
 from security import register_security_features
 from um import handle_login, logout_current_user
-from models import db, User, Team, user_teams  # 👈 import full models
+from models import db, User, Team, UserTeam
 
 # -----------------------------
 # APP SETUP
@@ -42,9 +42,9 @@ with app.app_context():
         print(f"[SCHEMA-HEAL] Creating missing tables in schema 'housebox'...")
         db.create_all()
 
-    # ✅ OPTIONAL: Seed default users and teams once
+    # ✅ Seed default users and teams once
     from seed import seed_users 
-    #seed_users()  # Safe to call; it only adds missing users
+    seed_users()  # Safe to call; it only adds missing users
 
 # -----------------------------
 # LOGIN MANAGER
@@ -54,46 +54,82 @@ login_manager.login_view = "login"
 login_manager.init_app(app)
 
 @login_manager.user_loader
-def load_user(email):
-    """Rehydrate user session from DB (not memory)."""
-    user = User.query.filter_by(email=email).first()
-    return user
+def load_user(user_id):
+    if not user_id:
+        return None
+    return db.session.get(User, user_id)
 
 # -----------------------------
 # ROUTES
 # -----------------------------
-@app.route('/')
-#@login_required
+def exc():
+        #@app.route('/')
+        #@login_required
+        def homes():
+            filepath = 'data/team_links.xlsx'
+
+            # If user has multiple teams, just show their first one for now
+            user_teams = current_user.get_team_names()
+            current_team = user_teams[0] if user_teams else None
+
+            sheets_to_load = ["scipher"]
+            if current_team:
+                sheets_to_load.insert(0, current_team)
+
+            print(f"[DEBUG] Home: loading sheets {sheets_to_load} for {current_user.email}")
+            all_links = load_excel(filepath, sheets=sheets_to_load)
+            links = prepare_links(all_links)
+            return render_template('index.html', links=links, team=current_team)
+
+@app.route("/")
 def home():
-    filepath = 'data/team_links.xlsx'
+    try:
+        filepath = "data/team_links.xlsx"
 
-    # If user has multiple teams, just show their first one for now
-    user_teams = current_user.get_team_names()
-    current_team = user_teams[0] if user_teams else None
+        # FIX: Correct sheet names
+        scipher_raw = load_excel(filepath, sheets=["scipher"])
+        scipher_links = prepare_links(scipher_raw)
 
-    sheets_to_load = ["general"]
-    if current_team:
-        sheets_to_load.insert(0, current_team)
+        roc_raw = load_excel(filepath, sheets=["roc"])
+        roc_links = prepare_links(roc_raw)
 
-    print(f"[DEBUG] Home: loading sheets {sheets_to_load} for {current_user.email}")
-    all_links = load_excel(filepath, sheets=sheets_to_load)
-    links = prepare_links(all_links)
-    return render_template('index.html', links=links, team=current_team)
+        return render_template(
+            "index.html",
+            scipher_links=scipher_links,
+            roc_links=roc_links
+        )
+
+    except Exception as e:
+        app.logger.error(f"Home Page Error: {e}")
+        return "Internal Server Error", 500
 
 
 @app.route('/team/<team_name>')
 @login_required
 def team_page(team_name):
-    filepath = 'data/team_links.xlsx'
-    print(f"[DEBUG] team_page for {team_name}, user={current_user.email}")
+    filepath = "data/team_links.xlsx"
+    team_name = team_name.lower()
 
-    if team_name not in current_user.get_team_names() and current_user.role != "admin":
-        flash("Access denied.", "danger")
-        return redirect(url_for('home'))
+    # List of teams the logged-in user is part of
+    user_teams = [t.lower() for t in current_user.get_team_names()]
 
-    all_links = load_excel(filepath, sheets=[team_name, "general"])
-    links = prepare_links(all_links)
-    return render_template('team.html', team_name=team_name, links=links)
+    # User is trying to access a team they don't belong to
+    if team_name not in user_teams:
+        return "Unauthorized or unknown team", 403
+
+    # Try loading this team's sheet
+    try:
+        data = load_excel(filepath, sheets=[team_name])
+        links = prepare_links(data)
+    except Exception:
+        links = []
+
+    return render_template(
+        "team.html",
+        team=team_name.capitalize(),
+        links=links
+    )
+
 
 
 @app.route('/my-team')
@@ -110,13 +146,14 @@ def my_team():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    
     return handle_login()
 
 
 @app.route('/logout')
 def logout():
     logout_current_user()
-    return redirect(url_for('login'))
+    return redirect(url_for('home'))
 
 # -----------------------------
 # ERROR HANDLING & SECURITY
