@@ -1,77 +1,53 @@
 # um.py
 from flask import request, render_template, flash, redirect, url_for
 from flask_login import login_user as flask_login_user, logout_user as flask_logout_user
-from werkzeug.security import generate_password_hash, check_password_hash
-from errors import InvalidCredentialsError
+from werkzeug.security import check_password_hash
 from models import User
+from errors import InvalidCredentialsError
 
-# ✅ Users keyed by EMAIL instead of username
-USERS = {
-    "admin@example.com": {
-        "email": "admin@example.com",
-        "role": "admin",
-        "team": "l1_ops",   # 👈 new field
-        "password": generate_password_hash("password123")
-    },
-    "manager@example.com": {
-        "email": "manager@example.com",
-        "role": "manager",
-        "team": "operations",   # 👈 new field
-        "password": generate_password_hash("secret456")
-    },
-    "sales@example.com": {
-        "email": "sales@example.com",
-        "role": "member",
-        "team": "sales",
-        "password": generate_password_hash("salespass")
-    },
-}
-
-def login_user(email, password):
-    """Authenticate user; return user dict if valid, raise InvalidCredentialsError if not."""
-    user = USERS.get(email)
-    if user and check_password_hash(user["password"], password):
-        return user
-    raise InvalidCredentialsError(f"Invalid login attempt for '{email}'")
 
 def handle_login():
     """Handle /login route (GET & POST)."""
-    if request.method == 'POST':
-        email = request.form.get('email', '').strip()
-        password = request.form.get('password', '').strip()
-        print(f"[DEBUG] POST /login email={email}")
 
-        user_data = USERS.get(email)
-        if not user_data:
-            print("[DEBUG] No user found")
-        else:
-            print("[DEBUG] Found user:", user_data)
+    # First load page
+    if request.method == 'GET':
+        return render_template('login.html')
 
-        if not user_data or not check_password_hash(user_data["password"], password):
-            print("[DEBUG] Password check failed")
-            flash("Invalid email or password", "danger")
-            return render_template('login.html')
+    # POST login attempt
+    email = request.form.get('email', '').strip()
+    password = request.form.get('password', '').strip()
 
-        print("[DEBUG] Password check passed")
+    print(f"[DEBUG] POST /login email={email}")
 
-        # ✅ Correct argument order (email, role, team)
-        user_obj = User(email, user_data["role"], user_data.get("team"))
+    # Fetch user from DB
+    user = User.query.filter_by(email=email).first()
 
-        flask_login_user(user_obj)
-        print(f"[DEBUG] Login successful for user: {email}, team: {user_data.get('team')}")
+    if not user:
+        flash("Invalid email or password", "danger")
+        print("[DEBUG] No such user in DB")
+        return render_template("login.html")
 
-        flash(f"Welcome back, {email}!", "success")
+    # Check password
+    if not check_password_hash(user.password_hash, password):
+        flash("Invalid email or password", "danger")
+        print("[DEBUG] Password mismatch")
+        return render_template("login.html")
 
-        # ✅ Redirect logic
-        if user_data.get("team"):
-            return redirect(url_for('team_page', team_name=user_data["team"]))
-        else:
-            return redirect(url_for('home'))
+    print("[DEBUG] Login successful for:", user.email)
 
-    print("[DEBUG] GET /login")
-    return render_template('login.html')
+    # Login with Flask-Login
+    flask_login_user(user)
+
+    flash(f"Welcome back, {user.email}!", "success")
+
+    # Redirect to team page if exists
+    team_names = user.get_team_names()
+    if team_names:
+        return redirect(url_for('team_page', team_name=team_names[0]))
+
+    return redirect(url_for('home'))
+
 
 def logout_current_user():
-    """Log out current user."""
     flask_logout_user()
-    return redirect(url_for('login'))
+    return redirect(url_for('home'))
