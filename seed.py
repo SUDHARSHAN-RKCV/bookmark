@@ -16,7 +16,7 @@ db.init_app(app)
 # =====================================
 # MASTER TEAM LIST
 # =====================================
-ALL_TEAMS = ["admin", "manager", "sales", "l1ops", "ROC", "scipher"]
+ALL_TEAMS = [ "l1_ops","scipher_vx","scipher_fx","scipher_rx","scipher_soc","scipher_di","roc","scipher","soc"]
 
 
 def seed_users():
@@ -31,12 +31,15 @@ def seed_users():
         print("[SCHEMA-HEAL] Creating missing tables...")
         db.create_all()
 
-        # Users to seed
+        # Users to seed ("email", "role", [teams], "password")
         user_data = [
-            ("admin@example.com", "admin", ["admin"], "password123"),
-            ("manager@example.com", "manager", ["manager", "sales"], "password123"),
-            ("l1ops@example.com", "l1ops", ["l1ops"], "password123"),
-            ("roc@example.com", "roc", ["ROC"], "password123"),
+            ("admin@example.com", "admin", [ "l1_ops","soc","roc","scipher","scipher_vx","scipher_fx","scipher_rx","scipher_soc","scipher_di"], "password123"),
+            ("manager@example.com", "manager", [ "l1_ops","roc","soc","scipher","scipher_vx","scipher_fx","scipher_rx","scipher_soc","scipher_di"], "password123"),
+            ("sre@example.com", "sre", [ "l1_ops","roc","scipher","soc","scipher_vx","scipher_fx","scipher_rx","scipher_soc","scipher_di"], "password123"),
+            ("l1ops@example.com", "l1_ops", ["l1_ops","roc","scipher"], "password123"),
+            ("roc@example.com", "roc", ["roc"], "password123"),
+            ("test@example.com", "roc", ["internal"], "password123"),
+            ("test3@example.com", "internal", ["internal"], "password123"),
         ]
 
         for email, role, base_teams, password in user_data:

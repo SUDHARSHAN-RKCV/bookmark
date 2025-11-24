@@ -7,3 +7,4 @@ instance/
 *.sqlite3
 .DS_Store
 *.sqlite*
+*.xlsx

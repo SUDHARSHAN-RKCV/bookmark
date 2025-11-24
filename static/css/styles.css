@@ -60,7 +60,7 @@ html, body {
   flex-wrap: wrap;
   justify-content: center;
   gap: 35px;                   /* ⬅ spacing between tiles */
-  max-width: 900px;            /* ⬅ keeps tiles from stretching full width */
+  max-width: 1900px;            /* ⬅ keeps tiles from stretching full width */
   margin: 0 auto;
   padding: 20px;               /* ⬅ prevents edge contact */
 }

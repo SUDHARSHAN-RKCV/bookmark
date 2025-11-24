@@ -43,9 +43,10 @@ def handle_login():
     # Redirect to team page if exists
     team_names = user.get_team_names()
     if team_names:
-        return redirect(url_for('team_page', team_name=team_names[0]))
+        return redirect(url_for('home', team_name=team_names[0]))
 
-    return redirect(url_for('home'))
+    return render_template('home.html')
+    #return redirect(url_for('home'))
 
 
 def logout_current_user():

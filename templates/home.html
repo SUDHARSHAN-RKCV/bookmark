@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="main-container">
+    <div class="card-container" id="cardContainer">
+        <div class="breadcrumb-back">
+            <button onclick="history.back()" class="back-btn">
+                <i class="fas fa-arrow-left"></i> Back
+            </button>
+        </div>
+        <a href="team/ROC" class="card">
+            <i class="fas fa-users-cog"></i><span>ROC</span>
+        </a>
+
+        <a href="team/scipher" class="card">
+            <i class="fas fa-users-cog"></i><span>Scipher Suite</span>
+        </a>
+
+        {% if current_user.is_authenticated and current_user.role == 'l1_ops' %}
+        <a href="team/l1_ops" class="card">
+            <i class="fas fa-users-cog"></i>
+            <span>L1 Ops</span>
+        </a>
+        {% endif %}
+
+        {% if current_user.is_authenticated and current_user.role in ['sre', 'admin'] %}
+        <a href="team/scipher_vx" class="card">...</a>
+        <a href="team/scipher_fx" class="card">...</a>
+        <a href="team/scipher_soc" class="card">...</a>
+        <a href="team/scipher_rx" class="card">...</a>
+        <a href="team/scipher_di" class="card">...</a>
+        <a href="team/soc" class="card">...</a>
+        {% endif %}
+
+        {% if current_user.is_authenticated and current_user.role == 'admin' %}
+        <a href="{{ url_for('admin_panel') }}" class="card">
+            <i class="fas fa-user-shield"></i>
+            <span>Admin Panel</span>
+        </a>
+        {% endif %}
+        <p>DEBUG: role = {{ current_user.role }}</p>
+
+    </div>
+</div>
+{% endblock %}
