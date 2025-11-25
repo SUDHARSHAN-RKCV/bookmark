@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="main-container">
+  <h1 class="title">{{ team_name | capitalize }}</h1>
+
+  {# ensure links are sorted by category so groupby works predictably #}
+  {% set grouped = links | sort(attribute='category') | groupby('category') %}
+
+  <div class="categories">
+    {% for category, items in grouped %}
+      {% set cat_name = category if category else 'Uncategorized' %}
+      <div class="category-card">
+        <div class="category-header">
+          <h2 class="category-title">{{ cat_name | capitalize }}</h2>
+          <span class="category-count">({{ items|length }})</span>
+        </div>
+
+        <div class="card-container">
+          {% for link in items %}
+            <a href="{{ link.href or link['URL'] }}"
+               target="{{ link.target or ('_blank' if (link['Type'] == 'external' or link.get('Type') == 'external') else '_self') }}"
+               class="card">
+              <i class="fas {{ link['Icon'] or 'fa-link' }}"></i>
+              <span>{{ link['Link Title'] or link['Team / Title'] or link.get('title') }}</span>
+            </a>
+          {% endfor %}
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
