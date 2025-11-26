@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>one-box</title>
+  <title>ScipherOps - ROC HUB</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
@@ -13,10 +13,10 @@
   <div class="topbar">
     
     <div class="topbar-left">
-      {% if current_user.is_authenticated %}
+      
       <i class="fas fa-bars menu-toggle"></i>
-      {% endif %}
-      <span class="logo">one-box</span>
+      
+      <span class="logo">ScipherOps - ROC HUB</span>
     </div>
     
 
@@ -48,56 +48,93 @@
       <h3>Quick Links</h3>
       <i class="fas fa-times close-menu"></i>
     </div>
+      
+      <div class="sidebar-links">
+        <a href="scipher" target="_self" >
+          <i class="fas fa-users-cog"></i>
+          <span>Scipher Suite</span>
+        </a>
+        <a href="ROC" target="_self" >
+          <i class="fas fa-users-cog"></i>
+          <span>ROC</span>
+        </a>
+      
+      {% if current_user.is_authenticated %}
+      <a href="scipher_vx" target="_self" >
+          <i class="fas fa-users-cog"></i>
+          <span>Scipher Vx</span>
+      </a>
+      <a href="scipher_Fx" target="_self" >
+          <i class="fas fa-users-cog"></i>
+          <span>Scipher Fx</span>
+      </a>
+      <a href="SOC" target="_self" >
+          <i class="fas fa-users-cog"></i>
+          <span>Scipher SOC</span>
+      </a>
+      <a href="scipher_Rx" target="_self" >
+          <i class="fas fa-users-cog"></i>
+          <span>Scipher Rx</span>
+      </a>
+      <a href="scipher_di" target="_self" >
+          <i class="fas fa-users-cog"></i>
+          <span>Scipher DI</span>
+      </a>
 
-    <div class="sidebar-links">
+      
+      <a href="l1_ops" target="_self" >
+          <i class="fas fa-users-cog"></i>
+          <span>l1_ops</span>
+      </a>
+      {% endif %}
       {% if current_user.is_authenticated and current_user.role == 'admin' %}
         <a href="{{ url_for('admin_panel') }}">
           <i class="fas fa-user-shield"></i> Admin Panel
         </a>
       {% endif %}
-      {% for link in links %}
-        <a href="{{ link.href }}" target="{{ link.target }}">
-          <i class="{{ link.Icon }}"></i> 
-          {{ link.Title }}
-        </a>
-      {% endfor %}
+      
     </div>
   </div>
 
   {% block content %}{% endblock %}
 
   <script>
-  const sidebar = document.getElementById('sidebar');
-  const toggle = document.querySelector('.menu-toggle');
-  const closeMenu = document.querySelector('.close-menu');
-  const searchBox = document.getElementById('searchBox');
-  const searchIcon = document.getElementById('searchIcon');
-  const searchInput = document.getElementById('search');
-
-  // Sidebar toggle
-  toggle.addEventListener('click', () => sidebar.classList.add('active'));
-  closeMenu.addEventListener('click', () => sidebar.classList.remove('active'));
-
-  // Toggle search box
-  searchIcon.addEventListener('click', () => {
-    searchBox.classList.toggle('active');
-    if (searchBox.classList.contains('active')) {
-      searchInput.focus();
-    } else {
-      searchInput.value = '';
-      document.querySelectorAll('.card').forEach(card => card.style.display = '');
+    const sidebar = document.getElementById('sidebar');
+    const toggle = document.querySelector('.menu-toggle');
+    const closeMenu = document.querySelector('.close-menu');
+    const searchBox = document.getElementById('searchBox');
+    const searchIcon = document.getElementById('searchIcon');
+    const searchInput = document.getElementById('search');
+    
+    // Sidebar toggle
+    if (toggle) toggle.addEventListener('click', () => sidebar.classList.add('active'));
+    if (closeMenu) closeMenu.addEventListener('click', () => sidebar.classList.remove('active'));
+    
+    // Toggle search box
+    if (searchIcon) {
+      searchIcon.addEventListener('click', () => {
+        searchBox.classList.toggle('active');
+        if (searchBox.classList.contains('active')) {
+          searchInput?.focus();
+        } else {
+          if (searchInput) searchInput.value = '';
+          document.querySelectorAll('.card').forEach(card => card.style.display = '');
+        }
+      });
     }
-  });
-
-  // 🔍 Live search filter (cards)
-  searchInput.addEventListener('input', () => {
-    const filter = searchInput.value.toLowerCase();
-    document.querySelectorAll('.card').forEach(card => {
-      const text = card.innerText.toLowerCase();
-      card.style.display = text.includes(filter) ? '' : 'none';
-    });
-  });
-  </script>
+    
+    // Live search filter
+    if (searchInput) {
+      searchInput.addEventListener('input', () => {
+        const filter = searchInput.value.toLowerCase();
+        document.querySelectorAll('.card').forEach(card => {
+          const text = card.innerText.toLowerCase();
+          card.style.display = text.includes(filter) ? '' : 'none';
+        });
+      });
+    }
+    </script>
+    
 
 </body>
 </html>

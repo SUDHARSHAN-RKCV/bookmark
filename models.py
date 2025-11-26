@@ -124,3 +124,15 @@ class User(UserMixin, db.Model):
             "role": self.role,
             "teams": self.get_team_names(),
         }
+
+ALL_TEAMS = [
+    "l1_ops",
+    "scipher_vx",
+    "scipher_fx",
+    "scipher_rx",
+    "scipher_soc",
+    "scipher_di",
+    "roc",
+    "scipher",
+    "soc"
+]

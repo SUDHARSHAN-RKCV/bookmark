@@ -1,5 +1,5 @@
 # seed.py
-from models import db, User, Team
+from models import db, User, Team,ALL_TEAMS
 from flask import Flask
 from sqlalchemy import text
 import os
@@ -16,7 +16,7 @@ db.init_app(app)
 # =====================================
 # MASTER TEAM LIST
 # =====================================
-ALL_TEAMS = [ "l1_ops","scipher_vx","scipher_fx","scipher_rx","scipher_soc","scipher_di","roc","scipher","soc"]
+
 
 
 def seed_users():
@@ -37,9 +37,7 @@ def seed_users():
             ("manager@example.com", "manager", [ "l1_ops","roc","soc","scipher","scipher_vx","scipher_fx","scipher_rx","scipher_soc","scipher_di"], "password123"),
             ("sre@example.com", "sre", [ "l1_ops","roc","scipher","soc","scipher_vx","scipher_fx","scipher_rx","scipher_soc","scipher_di"], "password123"),
             ("l1ops@example.com", "l1_ops", ["l1_ops","roc","scipher"], "password123"),
-            ("roc@example.com", "roc", ["roc"], "password123"),
-            ("test@example.com", "roc", ["internal"], "password123"),
-            ("test3@example.com", "internal", ["internal"], "password123"),
+            ("roc@example.com", "roc", ["roc","scipher"], "password123"),
         ]
 
         for email, role, base_teams, password in user_data:

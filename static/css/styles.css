@@ -26,6 +26,12 @@ html, body {
   text-align: center;
 }
 
+.logo-icon {
+    width: 45px;
+    height: 45px;
+    margin-right: 12px;
+    object-fit: contain;
+}
 
 .title {
   font-size: 60px;
@@ -187,6 +193,9 @@ html, body {
 }
 
 .logo {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
   font-size: 20px;
   font-weight: 600;
 }

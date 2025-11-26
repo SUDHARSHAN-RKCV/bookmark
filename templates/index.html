@@ -2,42 +2,42 @@
 {% block content %}
 <div class="main-container">
     <div class="card-container" id="cardContainer">
-        <a href="team/ROC" target="_self" class="card">
-            <i class="fas fa-users-cog"></i>
+        
+        <a href="public/ROC" target="_self" class="card">
+            <img src="/static/data/logo/ROC.png" class="logo-icon">
             <span>ROC</span>
         </a>
         <a href="team/scipher" target="_self" class="card">
-            <i class="fas fa-users-cog"></i>
+            <img src="/static/data/logo/scipher.jpg" class="logo-icon">
             <span>Scipher Suite</span>
         </a>
-        {% if current_user.is_authenticated %}
+        {% if current_user.is_authenticated and current_user.role in ['admin', 'sre', 'manager'] %}
+
         <a href="team/scipher_vx" target="_self" class="card">
-            <i class="fas fa-users-cog"></i>
+            <img src="/static/data/logo/VX.svg" class="logo-icon">
             <span>Scipher Vx</span>
         </a>
         <a href="team/scipher_Fx" target="_self" class="card">
-            <i class="fas fa-users-cog"></i>
+            <img src="/static/data/logo/FX.svg" class="logo-icon">
             <span>Scipher Fx</span>
         </a>
         <a href="team/SOC" target="_self" class="card">
-            <i class="fas fa-users-cog"></i>
+            <img src="/static/data/logo/SOC.png" class="logo-icon">
             <span>Scipher SOC</span>
         </a>
         <a href="team/scipher_Rx" target="_self" class="card">
-            <i class="fas fa-users-cog"></i>
+            <img src="/static/data/logo/Rx.svg" class="logo-icon">
             <span>Scipher Rx</span>
         </a>
         <a href="team/scipher_di" target="_self" class="card">
-            <i class="fas fa-users-cog"></i>
+            <img src="/static/data/logo/DI.png" class="logo-icon">
             <span>Scipher DI</span>
-        </a>
-        <a href="team/soc" target="_self" class="card">
-            <i class="fas fa-users-cog"></i>
-            <span>Scipher soc</span>
-        </a>
-        
+        </a>       
+        {% endif %}
+        {% if current_user.is_authenticated and current_user.role in ['admin', 'sre', 'manager','l1_ops'] %}
+
         <a href="team/l1_ops" target="_self" class="card">
-            <i class="fas fa-users-cog"></i>
+            <img src="/static/data/logo/scipher.jpg" class="logo-icon">
             <span>l1_ops</span>
         </a>
         {% endif %}

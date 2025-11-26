@@ -7,7 +7,7 @@ from helpers import load_excel, prepare_links
 from errors import register_error_handlers
 from security import register_security_features
 from um import handle_login, logout_current_user
-from models import db, User, Team, UserTeam
+from models import db, User, Team, UserTeam, ALL_TEAMS
 
 
 
@@ -16,10 +16,10 @@ from models import db, User, Team, UserTeam
 # -----------------------------
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "change-this-in-production")
-
+PUBLIC_SHEETS = ["roc"] 
 app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv(
     "DATABASE_URL",
-    "postgresql://postgres:passq123@localhost/postgres"
+    "postgresql://postgres:passq123@localhost/postgres"   # <-- your local DB
 )
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
@@ -69,14 +69,14 @@ def home():
     try:
         filepath = "data/team_links.xlsx"
 
-        scipher_links = prepare_links(load_excel(filepath, sheets=["scipher"]))
-        roc_links = prepare_links(load_excel(filepath, sheets=["roc"]))
+        links = prepare_links(load_excel(filepath, sheets=PUBLIC_SHEETS))
 
-        return render_template("index.html", scipher_links=scipher_links, roc_links=roc_links)
+        return render_template("index.html", links=links)
 
     except Exception as e:
         app.logger.error(f"Home Page Error: {e}")
         return "Server Error", 500
+
 
 
 @app.route('/admin_panel')
@@ -87,32 +87,79 @@ def admin_panel():
     users = User.query.all()
     teams = Team.query.all()
     return render_template('admin_panel.html', users=users, teams=teams)
+
+
+
 @app.route('/create_user', methods=['GET', 'POST'])
 @login_required
-
 def create_user():
-    # Handle form submit and save user
-    pass
+    teams = Team.query.all()
+
+    if request.method == "POST":
+        email = request.form.get("email").strip()
+        role = request.form.get("role")
+        password = request.form.get("password")
+        selected_teams = request.form.getlist("teams")  # ✅ get multiple checkboxes
+
+        if User.query.filter_by(email=email).first():
+            flash("A user with this email already exists.", "danger")
+            return redirect(url_for("create_user"))
+
+        user = User(email=email, role=role)
+        user.set_password(password)
+        db.session.add(user)
+        db.session.flush()  # so user.id is available
+
+        # role-based assignment
+        if role in ["admin", "manager"]:
+            assigned_teams = [t.name for t in Team.query.all()]
+        else:
+            assigned_teams = selected_teams
+
+        for t_name in assigned_teams:
+            user.add_team(t_name, commit=False)
+
+        db.session.commit()
+        flash("User created successfully!", "success")
+        return redirect(url_for("admin_panel"))
+
+    return render_template("create_user.html", teams=teams)
 
 
-@app.route("/edit_user/<int:user_id>", methods=["GET", "POST"])
+
+@app.route("/edit_user/<user_id>", methods=["GET", "POST"])
 @login_required
 def edit_user(user_id):
     user = User.query.get_or_404(user_id)
+    all_teams = Team.query.all()
 
     if request.method == "POST":
-        user.email = request.form.get("email")
+        user.email = request.form.get("email").strip()
         user.role = request.form.get("role")
+        selected_teams = request.form.getlist("teams")
+
+        # remove teams not selected
+        current_teams = user.get_team_names()
+        for t_name in current_teams:
+            if t_name not in selected_teams:
+                ut = UserTeam.query.filter_by(user_id=user.id, team_name=t_name).first()
+                if ut:
+                    db.session.delete(ut)
+
+        # add new teams
+        for t_name in selected_teams:
+            if t_name not in current_teams:
+                user.add_team(t_name, commit=False)
+
         db.session.commit()
+        flash("User updated successfully!", "success")
+        return redirect(url_for("admin_panel"))
 
-        flash("User details updated successfully!", "success")
-        return redirect(url_for("admin_panel"))  # 👈 FIX: Must return
-
-    # GET request → show form
-    return render_template("edit_user.html", user=user)  # 👈 FIX: Must return
+    return render_template("edit_user.html", user=user, all_teams=all_teams)
 
 
-@app.route('/disable_user/<int:user_id>')
+
+@app.route('/disable_user/<user_id>')
 @login_required
 
 def disable_user(user_id):
@@ -122,7 +169,7 @@ def disable_user(user_id):
     return redirect(url_for('admin_panel'))
 
 
-@app.route('/enable_user/<int:user_id>')
+@app.route('/enable_user/<user_id>')
 @login_required
 
 def enable_user(user_id):
@@ -132,7 +179,7 @@ def enable_user(user_id):
     return redirect(url_for('admin_panel'))
 
 
-@app.route('/delete_user/<int:user_id>')
+@app.route('/delete_user/<user_id>')
 @login_required
 
 def delete_user(user_id):
@@ -159,6 +206,17 @@ def team_page(team_name):
 
     return render_template("team.html", team=team_name.capitalize(), links=links)
 
+@app.route('/public/<team_name>')
+def public_team(team_name):
+    team_name = team_name.lower()
+
+    if team_name not in PUBLIC_SHEETS:
+        abort(404)
+
+    data = load_excel("data/team_links.xlsx", sheets=[team_name])
+    links = prepare_links(data)
+
+    return render_template("team.html", team_name=team_name, links=links)
 
 @app.route('/my-team')
 @login_required
@@ -198,4 +256,4 @@ register_security_features(app)
 # RUN SERVER
 # -----------------------------
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5001)
+    app.run(debug=True, host='0.0.0.0', port=5000)

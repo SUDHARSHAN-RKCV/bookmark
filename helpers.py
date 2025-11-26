@@ -44,22 +44,45 @@ def load_excel(file_path, sheets=None):
 
 
 def prepare_links(links):
-    """
-    Add target and href logic for internal vs external links.
-    If the URL starts with http(s):// -> open externally.
-    Otherwise, treat it as an internal route.
-    """
+    logo_folder = "static/data/logo"
+
     for link in links:
+
+        # -------------------------------
+        # URL handling
+        # -------------------------------
         url = link.get('URL', '').strip()
 
         if url.startswith('http://') or url.startswith('https://'):
-            link['target'] = '_blank'   # external link
+            link['target'] = '_blank'
             link['href'] = url
-        elif url:  # internal link
+        elif url:
             link['target'] = '_self'
             link['href'] = url_for('team_page', team_name=url.strip('/'))
         else:
             link['target'] = '_self'
             link['href'] = '#'
 
+        # -------------------------------
+        # ICON AUTO-DETECT 
+        # -------------------------------
+        icon_name = link.get("icon") or link.get("Icon") or ""
+        icon_name = icon_name.strip()
+
+        detected_icon_path = "/static/data/logo/default.png"  # fallback
+
+        if icon_name:
+            base_path = os.path.join(logo_folder, icon_name)
+
+            # Try all possible extensions
+            for ext in ["png", "jpg", "jpeg", "svg", "webp"]:
+                full_path = f"{base_path}.{ext}"
+                if os.path.isfile(full_path):
+                    detected_icon_path = f"/static/data/logo/{icon_name}.{ext}"
+                    break
+
+        link["logo"] = detected_icon_path
+
     return links
+
+

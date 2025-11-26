@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+.form-box {
+    max-width: 600px;
+    margin: auto;
+    background: #fff;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+
+.form-title {
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: #2c3e50;
+}
+
+.form-group { margin-bottom: 18px; }
+
+label {
+    font-weight: 600;
+    margin-bottom: 6px;
+    display: block;
+    color: #34495e;
+}
+
+input, select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 15px;
+}
+
+.multi-select {
+    width: 100%;
+    padding: 10px;
+    height: 150px;
+    border-radius: 6px;
+}
+
+.btn-main {
+    background: #2b8cff;
+    color: white;
+    padding: 10px 18px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-main:hover { background: #166cd8; }
+
+small {
+    color: #6b7280;
+    font-size: 13px;
+}
+</style>
+
+<script>
+function handleRoleChange() {
+    const role = document.getElementById("role-select").value;
+    const teamSection = document.getElementById("team-section");
+
+    // Admin + manager → teams auto assigned by backend → hide UI
+    if (role === "admin" || role === "manager") {
+        teamSection.style.display = "none";
+    } else {
+        teamSection.style.display = "block";
+    }
+}
+</script>
+
+
+<div class="form-box">
+    <h1 class="form-title">Create New User</h1>
+
+    <form method="POST">
+
+        <!-- Email -->
+        <div class="form-group">
+            <label>Email</label>
+            <input type="email" name="email" required>
+        </div>
+
+        <!-- Role -->
+        <div class="form-group">
+            <label>Role</label>
+            <select name="role" id="role-select" onchange="handleRoleChange()" required>
+                <option value="admin">Admin</option>
+                <option value="manager">Manager</option>
+                <option value="sre">SRE</option>
+                <option value="l1_ops">L1 Ops</option>
+                <option value="roc">ROC</option>
+            </select>
+        </div>
+
+        <!-- Password -->
+        <div class="form-group">
+            <label>Temporary Password</label>
+            <input type="password" name="password" required>
+        </div>
+
+       <!-- Team selection (only visible when role is NOT admin or manager) -->
+<div id="team-section">
+    <div class="form-group">
+        <label>Teams</label>
+        <div>
+            {% for t in teams %}
+                <label style="display:block; margin-bottom:6px;">
+                    <input type="checkbox" name="teams" value="{{ t.name }}"
+                        {% if t.name in selected_teams %} checked {% endif %}>
+                    {{ t.name }}
+                </label>
+            {% endfor %}
+        </div>
+        <small>Select one or more teams.</small>
+    </div>
+</div>
+
+
+        <button class="btn-main" type="submit">Create User</button>
+    </form>
+</div>
+
+<script>
+    // Run once on page load
+    handleRoleChange();
+</script>
+
+{% endblock %}
