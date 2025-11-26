@@ -13,10 +13,10 @@
   <div class="topbar">
     
     <div class="topbar-left">
-      
+      {% if current_user.is_authenticated %}
       <i class="fas fa-bars menu-toggle"></i>
-      
-      <span class="logo">ScipherOps - ROC HUB</span>
+      {% endif %}
+      <span class="logo">one-box</span>
     </div>
     
 

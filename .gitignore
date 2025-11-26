@@ -8,3 +8,5 @@ instance/
 .DS_Store
 *.sqlite*
 *.xlsx
+error_log.log
+*.log
